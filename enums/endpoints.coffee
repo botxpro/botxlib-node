@@ -8,3 +8,6 @@ module.exports =
   loadMarketItems:
     method: 'get'
     url: 'market/items'
+  loadMarketUserInventory:
+    method: 'get'
+    url: 'market/inventories'

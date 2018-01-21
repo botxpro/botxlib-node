@@ -5,7 +5,7 @@ module.exports = Botx = require './Botx.coffee'
 #   projectId: 13
 #   apiKey: 'W1L62DiZI-67Z9BVB69wRQ'
 
-# botx.loadItemSettings()
+# botx.loadUserInventory(uid: '76561198078016715')
 # .then (res) => 
 #   console.log 'res', res
 # .catch (err) =>

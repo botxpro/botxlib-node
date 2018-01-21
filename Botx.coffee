@@ -23,9 +23,17 @@ Botx::loadItemSettings = (params = {}) ->
     params.compact = true
 
   if params.compact
-    return @request 'loadItemSettingsCompact', params
+    data = await @request 'loadItemSettingsCompact', params
+    return data.prices
 
   @request 'loadItemSettings', params
+
+Botx::loadUserInventory = (params = {}) ->
+  unless params.uid
+    throw new Error 'uid is required'
+  inventory = await @request "load#{@_capitalize(@projectType)}UserInventory", params
+  inventory.items
+
 
 Botx::getUrl = (endpoint) ->
   return "#{@apiUrl}/#{@apiVersion}/remote/#{endpoint}"
@@ -46,12 +54,12 @@ Botx::buildParams = (params) ->
 Botx::buildRes = (params) ->
   if Array.isArray params
     return params.map (param) =>
-      @buildParams param
+      @buildRes param
 
   if typeof params == 'object'
     ret = {}
     for param of params
-      ret[camel(param)] = @buildParams params[param]
+      ret[camel(param)] = @buildRes params[param]
     return ret
 
   return params
@@ -68,10 +76,13 @@ Botx::request = (endpoint, params) ->
         params: params
     else
       res = await axios.post @getUrl(endpoint.url), params
-    @buildRes res
+    @buildRes res.data
   catch e
     if e.response && e.response.data
       throw e.response.data
     throw e
+
+Botx::_capitalize = (str) ->
+  str.charAt(0).toUpperCase() + str.slice(1);
 
 module.exports = Botx
