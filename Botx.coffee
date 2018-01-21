@@ -1,4 +1,5 @@
 snake = require 'to-snake-case'
+camel = require 'to-camel-case'
 axios = require 'axios'
 ENDPOINTS = require './enums/endpoints.coffee'
 
@@ -42,6 +43,19 @@ Botx::buildParams = (params) ->
 
   return params
 
+Botx::buildRes = (params) ->
+  if Array.isArray params
+    return params.map (param) =>
+      @buildParams param
+
+  if typeof params == 'object'
+    ret = {}
+    for param of params
+      ret[camel(param)] = @buildParams params[param]
+    return ret
+
+  return params
+
 Botx::request = (endpoint, params) ->
   endpoint = ENDPOINTS[endpoint]
   params = @buildParams params
@@ -54,6 +68,7 @@ Botx::request = (endpoint, params) ->
         params: params
     else
       res = await axios.post @getUrl(endpoint.url), params
+    @buildRes res
   catch e
     if e.response && e.response.data
       throw e.response.data
