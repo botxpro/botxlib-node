@@ -78,6 +78,8 @@ Botx::request = (endpoint, params) ->
       res = await axios.post @getUrl(endpoint.url), params
     @buildRes res.data
   catch e
+    if e.response && e.response.data && Array.isArray e.response.data.errors
+      throw new Error e.response.data.errors[0]
     if e.response && e.response.data
       throw e.response.data
     throw e
