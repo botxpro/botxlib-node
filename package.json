@@ -1,6 +1,6 @@
 {
   "name": "botxlib-node",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,8 @@
   "dependencies": {
     "axios": "^0.17.1",
     "coffeescript": "^2.1.1",
+    "safe-compare": "^1.1.0",
+    "sha256": "^0.2.0",
     "to-camel-case": "^1.0.0",
     "to-snake-case": "^1.0.0"
   }

@@ -11,3 +11,9 @@ module.exports =
   loadMarketUserInventory:
     method: 'get'
     url: 'market/inventories'
+  deposit:
+    method: 'post'
+    url: 'market/deposit'
+  withdraw:
+    method: 'post'
+    url: 'market/withdraw'

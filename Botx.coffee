@@ -1,7 +1,15 @@
-snake = require 'to-snake-case'
-camel = require 'to-camel-case'
+# @author    Gleb Vishnevsky (nfteam.ru/gleb.vishnevsky)
+# @copyright Copyright (c) 2017 Gleb Vishnevsky
+# @license   https://opensource.org/licenses/MIT The MIT License (MIT)
+
 axios = require 'axios'
+sha256 = require 'sha256'
+safeCompare = require 'safe-compare'
+{toCamel, toSnake} = require './helpers.coffee'
+
 ENDPOINTS = require './enums/endpoints.coffee'
+IpnCallback = require './IpnCallback.coffee'
+Transaction = require './Transaction.coffee'
 
 class Botx
   constructor: (@options = {}) ->
@@ -34,39 +42,24 @@ Botx::loadUserInventory = (params = {}) ->
   inventory = await @request "load#{@_capitalize(@projectType)}UserInventory", params
   inventory.items
 
+Botx::deposit = (params = {}) ->
+  res = await @request 'deposit', deposit: params
+  new Transaction res.transaction
+
+Botx::withdraw = (params = {}) ->
+  @checkWithdrawItems toCamel params.items
+  res = await @request 'withdraw', withdraw: params
+  new Transaction res.transaction
+
+Botx::loadMarketItems = (filters = {}) ->
+  await @request 'loadMarketItems', filters
 
 Botx::getUrl = (endpoint) ->
   return "#{@apiUrl}/#{@apiVersion}/remote/#{endpoint}"
 
-Botx::buildParams = (params) ->
-  if Array.isArray params
-    return params.map (param) =>
-      @buildParams param
-
-  if typeof params == 'object'
-    ret = {}
-    for param of params
-      ret[snake(param)] = @buildParams params[param]
-    return ret
-
-  return params
-
-Botx::buildRes = (params) ->
-  if Array.isArray params
-    return params.map (param) =>
-      @buildRes param
-
-  if typeof params == 'object'
-    ret = {}
-    for param of params
-      ret[camel(param)] = @buildRes params[param]
-    return ret
-
-  return params
-
 Botx::request = (endpoint, params) ->
   endpoint = ENDPOINTS[endpoint]
-  params = @buildParams params
+  params = toSnake params
   params.api_key = @apiKey
   params.project_id = @projectId
 
@@ -76,7 +69,7 @@ Botx::request = (endpoint, params) ->
         params: params
     else
       res = await axios.post @getUrl(endpoint.url), params
-    @buildRes res.data
+    toCamel res.data
   catch e
     if e.response && e.response.data && Array.isArray e.response.data.errors
       throw new Error e.response.data.errors[0]
@@ -85,6 +78,48 @@ Botx::request = (endpoint, params) ->
     throw e
 
 Botx::_capitalize = (str) ->
-  str.charAt(0).toUpperCase() + str.slice(1);
+  str.charAt(0).toUpperCase() + str.slice(1)
+
+Botx::handler = (notification) ->
+  try
+    ipnCallback = new IpnCallback @, notification
+    Promise.resolve ipnCallback.transaction
+  catch err
+    Promise.reject err
+
+Botx::checkWithdrawItems = (items) ->
+  unless items && items.length == 0
+    throw new Error 'errors.items_not_passed'
+
+  for item in items
+    if @checkItemHash item 
+      throw new Error 'errors.wrong_hash'
+
+  true
+
+Botx::checkItemHash = (item) ->
+  unless item then return false
+  safeCompare item.hash, @calculateItemHash item
+
+Botx::calculateItemHash = (item) ->
+  params = [
+    @item.appid, 
+    @item.contextid, 
+    @item.assetid, 
+    @item.ourPrice, 
+    @item.steamPrice, 
+    @apiKey
+  ]
+  sha256 "{#{params.join '}{'}}"
+
+
+
+
+
+
+
+
+
+
 
 module.exports = Botx
