@@ -71,10 +71,10 @@ Botx::request = (endpoint, params) ->
       res = await axios.post @getUrl(endpoint.url), params
     toCamel res.data
   catch e
-    if e.response && e.response.data && Array.isArray e.response.data.errors
-      throw new Error errorToCamel e.response.data.errors[0]
     if e.response && e.response.data && e.response.data.errors && e.response.data.errors.full_messages && Array.isArray(e.response.data.errors.full_messages)
       throw new Error errorToCamel e.response.data.errors.full_messages[0]
+    if e.response && e.response.data && Array.isArray e.response.data.errors
+      throw new Error errorToCamel e.response.data.errors[0]
     if e.response && e.response.data
       throw errorToCamel e.response.data
     throw errorToCamel e
