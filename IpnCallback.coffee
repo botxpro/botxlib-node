@@ -14,7 +14,7 @@ class IpnCallback
       try
         @notifiation = JSON.parse @notifiation
       catch err
-        throw new Error 'errors.cannot_parse_json'
+        throw new Error 'errors.cannotParseJson'
 
     @signature = @notifiation.sign
     @transaction = new Transaction @notifiation.transaction
@@ -23,7 +23,7 @@ class IpnCallback
 
 IpnCallback::checkSignature = ->
   unless safeCompare @signature, do @calculateSignature
-    throw new Error 'errors.wrong_signature'
+    throw new Error 'errors.wrongSignature'
 
 IpnCallback::calculateSignature = ->
   params = [

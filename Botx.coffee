@@ -5,7 +5,7 @@
 axios = require 'axios'
 sha256 = require 'sha256'
 safeCompare = require 'safe-compare'
-{toCamel, toSnake} = require './helpers.coffee'
+{toCamel, toSnake, errorToCamel} = require './helpers.coffee'
 
 ENDPOINTS = require './enums/endpoints.coffee'
 IpnCallback = require './IpnCallback.coffee'
@@ -38,7 +38,7 @@ Botx::loadItemSettings = (params = {}) ->
 
 Botx::loadUserInventory = (params = {}) ->
   unless params.uid
-    throw new Error 'uid is required'
+    throw new Error 'errors.uidIsRequired'
   inventory = await @request "load#{@_capitalize(@projectType)}UserInventory", params
   inventory.items
 
@@ -72,10 +72,12 @@ Botx::request = (endpoint, params) ->
     toCamel res.data
   catch e
     if e.response && e.response.data && Array.isArray e.response.data.errors
-      throw new Error e.response.data.errors[0]
+      throw new Error errorToCamel e.response.data.errors[0]
+    if e.response && e.response.data && e.response.data.errors && e.response.data.errors.full_messages && Array.isArray(e.response.data.errors.full_messages)
+      throw new Error errorToCamel e.response.data.errors.full_messages[0]
     if e.response && e.response.data
-      throw e.response.data
-    throw e
+      throw errorToCamel e.response.data
+    throw errorToCamel e
 
 Botx::_capitalize = (str) ->
   str.charAt(0).toUpperCase() + str.slice(1)
@@ -89,11 +91,11 @@ Botx::handler = (notification) ->
 
 Botx::checkWithdrawItems = (items) ->
   unless items && items.length == 0
-    throw new Error 'errors.items_not_passed'
+    throw new Error 'errors.itemsNotPassed'
 
   for item in items
     if @checkItemHash item 
-      throw new Error 'errors.wrong_hash'
+      throw new Error 'errors.wrongHash'
 
   true
 
