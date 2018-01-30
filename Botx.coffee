@@ -36,24 +36,6 @@ Botx::loadItemSettings = (params = {}) ->
 
   @request 'loadItemSettings', params
 
-Botx::loadUserInventory = (params = {}) ->
-  unless params.uid
-    throw new Error 'errors.uidIsRequired'
-  inventory = await @request "load#{@_capitalize(@projectType)}UserInventory", params
-  inventory.items
-
-Botx::deposit = (params = {}) ->
-  res = await @request 'deposit', deposit: params
-  new Transaction res.transaction
-
-Botx::withdraw = (params = {}) ->
-  @checkWithdrawItems toCamel params.items
-  res = await @request 'withdraw', withdraw: params
-  new Transaction res.transaction
-
-Botx::loadMarketItems = (filters = {}) ->
-  await @request 'loadMarketItems', filters
-
 Botx::getUrl = (endpoint) ->
   return "#{@apiUrl}/#{@apiVersion}/remote/#{endpoint}"
 
@@ -114,14 +96,7 @@ Botx::calculateItemHash = (item) ->
   ]
   sha256 "{#{params.join '}{'}}"
 
-
-
-
-
-
-
-
-
-
+# components
+require './components/market.coffee'
 
 module.exports = Botx
