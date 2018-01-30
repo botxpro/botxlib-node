@@ -1,4 +1,5 @@
 Botx = require '../Botx.coffee'
+Transaction = require '../Transaction.coffee'
 
 Botx::loadUserInventory = (params = {}) ->
   unless params.uid
