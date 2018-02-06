@@ -9,11 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async-redis": "^1.0.0",
     "axios": "^0.17.1",
+    "centrifuge": "^1.4.8",
     "coffeescript": "^2.1.1",
+    "events": "^2.0.0",
+    "object-hash": "^1.2.0",
     "safe-compare": "^1.1.0",
     "sha256": "^0.2.0",
     "to-camel-case": "^1.0.0",
-    "to-snake-case": "^1.0.0"
+    "to-snake-case": "^1.0.0",
+    "universal-websocket-client": "^1.0.1"
   }
 }

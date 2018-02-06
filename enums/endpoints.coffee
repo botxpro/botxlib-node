@@ -17,3 +17,6 @@ module.exports =
   withdraw:
     method: 'post'
     url: 'market/withdraw'
+  tokens:
+    method: 'get'
+    url: 'tokens'

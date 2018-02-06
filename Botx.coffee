@@ -1,6 +1,7 @@
 # @author    Gleb Vishnevsky (nfteam.ru/gleb.vishnevsky)
 # @copyright Copyright (c) 2017 Gleb Vishnevsky
 # @license   https://opensource.org/licenses/MIT The MIT License (MIT)
+EventEmitter = require 'events'
 
 axios = require 'axios'
 sha256 = require 'sha256'
@@ -11,8 +12,9 @@ ENDPOINTS = require './enums/endpoints.coffee'
 IpnCallback = require './IpnCallback.coffee'
 Transaction = require './Transaction.coffee'
 
-class Botx
+class Botx extends EventEmitter
   constructor: (@options = {}) ->
+    super()
     @apiUrl = @options.apiUrl || 'https://api.botx.pro'
     @apiVersion = @options.apiVersion || 'v1'
 
@@ -20,11 +22,16 @@ class Botx
     @apiKey = @options.apiKey
     @projectType = @options.projectType
 
+    do @initializers
+
     unless @projectId && @apiKey
       throw new Error 'projectId and apiKey required'
 
     unless ['market', 'individual'].includes @projectType
       throw new Error "#{@projectType} is not valid project type"
+
+Botx::initializers = ->
+  do @initSockets
 
 Botx::loadItemSettings = (params = {}) ->
   unless params.compact
@@ -65,11 +72,15 @@ Botx::_capitalize = (str) ->
   str.charAt(0).toUpperCase() + str.slice(1)
 
 Botx::handler = (notification) ->
+  if @redis
+    notificationExist = await @checkNotificationExist notification
+  if @redis && notificationExist
+    return
   try
     ipnCallback = new IpnCallback @, notification
-    Promise.resolve ipnCallback.transaction
+    ipnCallback.transaction
   catch err
-    Promise.reject err
+    throw err
 
 Botx::checkWithdrawItems = (items) ->
   unless items && items.length == 0
@@ -96,7 +107,8 @@ Botx::calculateItemHash = (item) ->
   ]
   sha256 "{#{params.join '}{'}}"
 
+module.exports = Botx
+
 # components
 require './components/market.coffee'
-
-module.exports = Botx
+require './components/sockets.coffee'

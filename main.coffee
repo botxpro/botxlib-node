@@ -2,8 +2,9 @@ module.exports = Botx = require './Botx.coffee'
 
 botx = new Botx
   projectType: 'market'
-  projectId: 13
-  apiKey: 'W1L62DiZI-67Z9BVB69wRQ'
+  projectId: 14
+  apiKey: '5l5k1PFj-JPwDqq6SRSqPg'
+  # redis: {}
 
 # botx.deposit 
 #   uid: '76561198078016715'
