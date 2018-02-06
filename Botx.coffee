@@ -78,6 +78,7 @@ Botx::handler = (notification) ->
     return
   try
     ipnCallback = new IpnCallback @, notification
+    @emit 'transaction', ipnCallback.transaction
     ipnCallback.transaction
   catch err
     throw err
