@@ -111,4 +111,5 @@ module.exports = Botx
 
 # components
 require './components/market.coffee'
+require './components/individual.coffee'
 require './components/sockets.coffee'
