@@ -10,24 +10,35 @@ Botx::initSockets = ->
 
   @connected = false
   @socketUrl = @options.socketUrl || "https://centrifugo.botx.pro/connection/websocket"
+  @socketsInitialized = true
   try
     await @connect()
-    @centrifuge
-    @addSocketHandlers()
+    
   catch e
     console.log 'can\'t connect to botx', e
 
+Botx::waitForSocketsConnect = ->
+  new Promise (resolve, reject) =>
+    @once 'connect', (data) =>
+      resolve data
+    @once 'disconnect', (data) =>
+      reject data
+
 Botx::addSocketHandlers = ->
+  if @handlersInitialized then return
+  @handlersInitialized = true
   @centrifuge.subscribe "transaction##{@token.user}", (message) =>
     @handler message.data
 
   @centrifuge.on 'connect', (data) =>
     @connected = true
     console.log 'CONNECTED TO BOTX'
+    @emit 'connect', data
 
   @centrifuge.on 'disconnect', (err) =>
     @connected = false
     console.log 'DISCONNECTED FROM BOTX; REASON:', err.reason
+    @emit 'disconnect', err
 
 
 Botx::getNotificationHash = (notification) ->
@@ -42,6 +53,8 @@ Botx::getSocketToken = ->
   @request 'tokens', uid: if @options.user then @options.user.steamId
 
 Botx::connect = ->
+  unless @socketsInitialized
+    return await @initSockets()
   @token = data = await @getSocketToken()
   @centrifuge = new Centrifuge
     url: @socketUrl
@@ -49,4 +62,7 @@ Botx::connect = ->
     timestamp: data.timestamp + ''
     token: data.token
   @centrifuge.connect()
+  @addSocketHandlers()
+  await @waitForSocketsConnect()
+  
 

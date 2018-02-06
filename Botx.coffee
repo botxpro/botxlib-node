@@ -31,7 +31,6 @@ class Botx extends EventEmitter
       throw new Error "#{@projectType} is not valid project type"
 
 Botx::initializers = ->
-  do @initSockets
 
 Botx::loadItemSettings = (params = {}) ->
   unless params.compact
