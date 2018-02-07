@@ -82,7 +82,7 @@ Botx::parseNotification = (notification) ->
     throw err
 
 Botx::handler = (notification) ->
-  transaction = @parseNotification notification
+  transaction = await @parseNotification notification
   @emit 'transaction', transaction
   transaction
 
