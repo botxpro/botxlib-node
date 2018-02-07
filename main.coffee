@@ -4,9 +4,9 @@ botx = new Botx
   projectType: 'market'
   projectId: 14
   apiKey: '5l5k1PFj-JPwDqq6SRSqPg'
-  # redis: {}
-# do ->
-#   await botx.connect()
+  redis: {}
+do ->
+  await botx.connect()
 
 # botx.deposit 
 #   uid: '76561198078016715'

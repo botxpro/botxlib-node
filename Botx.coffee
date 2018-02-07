@@ -71,19 +71,20 @@ Botx::_capitalize = (str) ->
   str.charAt(0).toUpperCase() + str.slice(1)
 
 Botx::parseNotification = (notification) ->
+  if @redis
+    notificationExist = await @checkNotificationExist notification
+  if @redis && notificationExist
+    return
   try
     ipnCallback = new IpnCallback @, notification
-    @emit 'transaction', ipnCallback.transaction
     ipnCallback.transaction
   catch err
     throw err
 
 Botx::handler = (notification) ->
-  if @redis
-    notificationExist = await @checkNotificationExist notification
-  if @redis && notificationExist
-    return
-  @parseNotification notification
+  transaction = @parseNotification notification
+  @emit 'transaction', transaction
+  transaction
 
 Botx::checkWithdrawItems = (items) ->
   unless items && items.length == 0
