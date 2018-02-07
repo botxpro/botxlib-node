@@ -20,3 +20,18 @@ module.exports =
   tokens:
     method: 'get'
     url: 'tokens'
+  loadIndividualItems:
+    method: 'get'
+    url: 'individual/items'
+  loadTradeoffers:
+    method: 'get'
+    url: 'individual/tradeoffers'
+  sendTradeoffer:
+    method: 'post'
+    url: 'individual/tradeoffers'
+  getTradeofferById:
+    method: 'get'
+    url: 'individual/tradeoffers'
+  loadIndividualUserInventory:
+    method: 'get'
+    url: 'individual/inventories'
