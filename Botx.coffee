@@ -86,31 +86,6 @@ Botx::handler = (notification) ->
   @emit 'transaction', transaction
   transaction
 
-Botx::checkWithdrawItems = (items) ->
-  unless items && items.length == 0
-    throw new Error 'errors.itemsNotPassed'
-
-  for item in items
-    if @checkItemHash item 
-      throw new Error 'errors.wrongHash'
-
-  true
-
-Botx::checkItemHash = (item) ->
-  unless item then return false
-  safeCompare item.hash, @calculateItemHash item
-
-Botx::calculateItemHash = (item) ->
-  params = [
-    @item.appid, 
-    @item.contextid, 
-    @item.assetid, 
-    @item.ourPrice, 
-    @item.steamPrice, 
-    @apiKey
-  ]
-  sha256 "{#{params.join '}{'}}"
-
 module.exports = Botx
 
 # components
