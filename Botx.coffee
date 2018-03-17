@@ -82,7 +82,6 @@ Botx::parseNotification = (notification) ->
     throw err
 
 Botx::handler = (notification) ->
-  console.log notification
   unless notification && notification.transaction then return
   transaction = await @parseNotification notification
   @emit 'transaction', transaction
