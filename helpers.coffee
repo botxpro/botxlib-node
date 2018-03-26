@@ -32,6 +32,8 @@ toCamel = (params) ->
   return params
 
 errorToCamel = (str) ->
+  unless typeof str == 'string'
+    return str
   str.replace /(\_\w)/g, (m) ->
     return m[1].toUpperCase()
 

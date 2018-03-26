@@ -63,6 +63,8 @@ Botx::request = (endpoint, params) ->
       throw new Error errorToCamel e.response.data.errors.full_messages[0]
     if e.response && e.response.data && Array.isArray e.response.data.errors
       throw new Error errorToCamel e.response.data.errors[0]
+    if e.response && e.response.data.error
+      throw errorToCamel e.response.data.error
     if e.response && e.response.data
       throw errorToCamel e.response.data
     throw errorToCamel e
