@@ -35,3 +35,6 @@ module.exports =
   loadIndividualUserInventory:
     method: 'get'
     url: 'individual/inventories'
+  respondToTradeoffer:
+    method: 'put'
+    url: 'individual/tradeoffers'

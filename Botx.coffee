@@ -52,11 +52,16 @@ Botx::request = (endpoint, params) ->
   params.project_id = @projectId
 
   try
-    if endpoint.method == 'get'
-      res = await axios.get @getUrl(endpoint.url),
-        params: params
-    else
-      res = await axios.post @getUrl(endpoint.url), params
+    switch endpoint.method
+      when 'get'
+        res = await axios.get @getUrl(endpoint.url),
+          params: params
+      when 'post'
+        res = await axios.post @getUrl(endpoint.url), params
+      when 'put'
+        res = await axios.put @getUrl(endpoint.url), params
+      else
+        throw new Error 'Unknown request method'
     toCamel res.data
   catch e
     if e.response && e.response.data && e.response.data.errors && e.response.data.errors.full_messages && Array.isArray(e.response.data.errors.full_messages)
