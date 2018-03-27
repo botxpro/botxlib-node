@@ -23,9 +23,10 @@ Botx::sendTradeoffer = (tradeoffer = {}) ->
 
 Botx::respondToTradeoffer = (offer_id = "", partner = "", bot_id = "", action = "") ->
   await @request 'respondToTradeoffer', 
-    offer_id: offer_id
-    partner: partner
-    bot_id: bot_id
+    tradeoffer:
+      offer_id: offer_id
+      partner: partner
+      bot_id: bot_id
     action: action
 
 Botx::getTradeoffer = (id = "") ->
